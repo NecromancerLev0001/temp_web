@@ -1,0 +1,38 @@
+from .statusinfo import StatusInfo
+import json
+from datetime import datetime, timedelta
+
+class InfoRepository:
+    __shared_state = {}
+    __repo = {}
+
+    def __init__(self, sInfo=StatusInfo()):
+        self.__dict__ = self.__shared_state
+        self.state = 'Init'
+        self.supdate(sInfo)
+
+    def supdate(self, sInfo):
+        self.__repo.update({sInfo.sysid: sInfo.jinfo()})
+
+    def jupdate(self, tInfo):
+        jInfo = json.loads(tInfo)
+        self.__repo.update({jInfo['sysid']: tInfo})
+
+    def sinfo(self, sysid):
+        tdata = json.loads(self.__repo[sysid])
+        return StatusInfo(sdata=tdata)
+        
+    def jinfo(self, sysid):
+        return self.__repo[sysid]
+
+    def errSys(self):
+        for rkey in self.__repo.keys():
+            if self.sinfo(rkey).isError():
+                return rkey
+
+    def __str__(self):
+        return self.state
+
+
+ifman = InfoRepository()
+
